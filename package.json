@@ -1,0 +1,12 @@
+{
+  "name": "notebook",
+  "version": "1.0.0",
+  "description": "A simple static markdown notebook organized by folder",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node build-manifest.js"
+  },
+  "license": "MIT"
+}

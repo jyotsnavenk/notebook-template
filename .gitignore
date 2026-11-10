@@ -1,0 +1,7 @@
+.DS_Store
+*.log
+
+# Skills (installed, not tracked)
+.agents/skills/
+.claude/skills/
+skills-lock.json

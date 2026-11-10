@@ -1,0 +1,793 @@
+/* ---------- Design tokens ----------
+   Typography mirrors benji.org: a single 18px system-ui scale that never
+   responds to screen size, two weights (460 body / 500 emphasis), and two
+   text colors (#111 primary, 40% black secondary). The only thing that
+   changes across breakpoints is the container's padding. */
+:root {
+  --bg: #ffffff;
+  --text: #111111;              /* benji primary text */
+  /* Every muted / secondary text is #000000 at 40% */
+  --muted: rgba(0, 0, 0, 0.4);
+  --faint: rgba(0, 0, 0, 0.4);
+  --line: #e6e6e6;
+  --line-strong: #d0d0d0;
+  --code-bg: #f6f6f6;
+
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --brand: #a52a2a;
+  --content-max: 45rem;         /* 720px outer box (padding-inclusive) */
+  --tracking: -0.09008px;       /* benji letter-spacing */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 460;
+  line-height: 1.6;
+  letter-spacing: var(--tracking);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* ---------- Layout ---------- */
+.app {
+  display: flex;
+  min-height: 100%;
+}
+
+/* The sidebar floats over the left margin (fixed) rather than reserving a
+   column, so .content spans the full viewport and centers the container to the
+   whole page. On screens narrow enough that the centered 720px box reaches the
+   sidebar, they overlap — hence the solid background. */
+.sidebar {
+  width: max-content;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background: var(--bg);
+  overflow-y: auto;
+  padding: 5rem 1.75rem;
+}
+
+/* ---------- Sidebar brand / home link ---------- */
+.brand {
+  display: block;
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 460;
+  color: rgba(17, 17, 17, 0.3); /* #111 @ 30% */
+  text-decoration: none;
+  white-space: nowrap;
+  margin-bottom: 52px;
+}
+
+.brand:hover {
+  color: rgba(17, 17, 17, 0.9); /* #111 @ 90% */
+}
+
+/* ---------- Navigation ---------- */
+.nav {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 460;
+}
+
+.nav-group {
+  padding: 0.9rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Thin divider between groups */
+.nav-group + .nav-group {
+  border-top: 1px solid var(--line);
+}
+
+.nav-group:first-child {
+  padding-top: 0;
+}
+
+.nav-link {
+  display: block;
+  padding: 0;
+  line-height: 1;
+  color: rgba(17, 17, 17, 0.3); /* #111 @ 30% */
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: 1;
+  transition: color 0.12s ease, opacity 0.25s ease;
+}
+
+/* Nav items fade once the page is scrolled away from the top */
+.nav.scrolled .nav-link {
+  opacity: 0.3;
+}
+
+.nav-link:hover {
+  color: rgba(17, 17, 17, 0.9); /* #111 @ 90% */
+}
+
+.nav-link.active {
+  color: rgba(17, 17, 17, 0.9); /* #111 @ 90% */
+}
+
+.nav-empty {
+  color: var(--faint);
+  font-size: 18px;
+  font-family: var(--sans);
+}
+
+/* ---------- Per-page table of contents (sidebar on note pages) ----------
+   One link per H2. Muted by default so the section you're reading, marked
+   .active by the scrollspy, stands out. Unlike the old note list, the TOC
+   stays fully readable while the page is scrolled. */
+.toc-nav-link {
+  color: rgba(17, 17, 17, 0.3); /* #111 @ 30% */
+}
+
+.nav.scrolled .toc-nav-link {
+  opacity: 1;
+}
+
+.toc-nav-link.active {
+  color: rgba(17, 17, 17, 0.9); /* #111 @ 90% */
+}
+
+/* ---------- Content ---------- */
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- Top "↩ Index" link (shown when the nav collapses) ----------
+   On wide screens the "↩ Index" link lives in the sidebar. Once the centered
+   container nears the sidebar and the sidebar is removed (.app.nav-collapsed,
+   driven from app.js), this copy takes its place at the top of the page. It
+   shares the note's max-width and side padding so it left-aligns with the note
+   text. Hidden by default. */
+.brand-top {
+  display: none;
+  width: 100%;
+  max-width: var(--content-max);
+  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 4vw, 1.5rem) 0;
+}
+
+.app.nav-collapsed .sidebar {
+  display: none;
+}
+
+.app.nav-collapsed .brand-top {
+  display: block;
+}
+
+/* With the link occupying the top, the note no longer needs its full top pad. */
+.app.nav-collapsed .note {
+  padding-top: 1.5rem;
+}
+
+.note {
+  width: 100%;
+  max-width: var(--content-max);
+  /* Progressive padding — scales fluidly with the viewport, no breakpoints:
+       top    32px → 80px  (clamp 2rem…5rem via 6vw)
+       sides  16px → 24px  (clamp 1rem…1.5rem via 4vw)
+       bottom 40px (fixed) */
+  padding: clamp(2rem, 6vw, 5rem) clamp(1rem, 4vw, 1.5rem) 2.5rem;
+}
+
+.empty-state {
+  color: var(--faint);
+  font-family: var(--sans);
+  font-size: 18px;
+  margin-top: 2rem;
+}
+
+/* ---------- Landing page (table of contents) ---------- */
+/* The landing page stands alone — no sidebar nav, and no top Index link
+   (you're already at the index) */
+.app:has(.landing) .sidebar,
+.app:has(.landing) .brand-top {
+  display: none;
+}
+
+.landing .note-header {
+  margin-bottom: 2.5rem;
+}
+
+/* Each group is a two-column row: the folder label on the left, the list of
+   note titles on the right. A full-width rule tops every group, separating it
+   from the one above. */
+.toc-group {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  column-gap: 48px;
+  align-items: start;
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* Folder name (h3) sits in the left column, top-aligned with the first title */
+.landing .toc-folder {
+  grid-column: 1;
+  margin: 0;
+  padding-top: 12px;
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 460;
+  font-style: normal;
+  line-height: 24px;
+  color: var(--muted);
+}
+
+/* Reset the note list's arrow bullets / indentation for a clean TOC list */
+.note ul.toc-list {
+  grid-column: 2;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Each title row has a divider at the bottom; the last defers to the next
+   group's full-width top rule so the lines never double up. */
+.note ul.toc-list > li.toc-item {
+  margin: 0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.note ul.toc-list > li.toc-item:last-child {
+  border-bottom: none;
+}
+
+.note ul.toc-list > li.toc-item::before {
+  content: none;
+}
+
+/* Each note link reads as plain body text */
+.note a.toc-link {
+  display: block;
+  font-size: 18px;
+  color: #171717;
+  text-decoration: none;
+  transition: color 0.12s ease;
+}
+
+.toc-title {
+  display: block;
+}
+
+/* Hovering any second-column item fades the others to #171717 at 30% opacity,
+   while the hovered row stays at full #171717. Only the note list (column 2)
+   is affected — the folder labels in column 1 are left untouched. With no row
+   hovered, every row shows full #171717. */
+.landing:has(.toc-item:hover) .toc-link {
+  color: rgba(23, 23, 23, 0.3);
+}
+
+.landing .toc-item:hover .toc-link {
+  color: #171717;
+}
+
+/* ---------- Note typography (markdown) ----------
+   Flattened to benji's single scale: 14px everywhere, headings carried only
+   by weight 500 (no serif, no size hierarchy). */
+.note h1,
+.note h2,
+.note h3,
+.note h4 {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--text);
+  margin: 2.2rem 0 0.8rem;
+}
+
+/* Title + meta row (title left, folder/date right) */
+.note-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.note h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Hatched highlight + underline (after cognition.com). On the inner span
+   so it hugs the text line by line rather than spanning the column. */
+.note h1 > span {
+  background-image: repeating-linear-gradient(
+    -60deg,
+    rgba(23, 23, 23, 0.05) 0 1px, /* #171717 @ 5% */
+    transparent 1px 2px
+  );
+  text-decoration: underline 1px #525252;
+  text-underline-offset: 4px;
+}
+
+/* An h1 that follows body text starts a new section, so give it room. */
+.note :is(p, ul, ol, blockquote) + h1 {
+  margin-top: 64px;
+}
+
+.note h2 {
+  margin: 64px 0 1.4rem;
+  font-weight: 600;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* #000 @ 10% */
+}
+
+.note p,
+.note li {
+  font-size: 18px;
+  font-weight: 460;
+}
+
+.note p {
+  margin: 0 0 24px;
+}
+
+.note a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 0, 0, 0.3);
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+.note a:hover {
+  text-decoration-color: #000000; /* the resting 30% underline at full opacity */
+}
+
+.note u {
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 0, 0, 0.3);
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+/* Bold is 600 everywhere, including hover popovers (which live outside .note). */
+strong,
+b {
+  font-weight: 600;
+}
+
+.note ul,
+.note ol {
+  margin: 0 0 24px; /* match the paragraph-to-paragraph gap */
+  padding-left: 1.5rem;
+}
+
+.note li {
+  margin-bottom: 0.65rem;
+}
+
+/* Arrow markers for unordered lists */
+.note ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.note ul > li {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.note ul > li::before {
+  content: "\27A4";
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  font-size: 0.72em;
+  color: var(--faint);
+}
+
+.note ol > li::marker {
+  color: var(--faint);
+}
+
+/* Sub-lists (indented under a list item): numbered ones count a, b, c,
+   and they sit close to their parent item instead of a paragraph gap. */
+.note li > :is(ul, ol) {
+  margin: 0.65rem 0 0;
+}
+.note ol ol {
+  list-style-type: lower-alpha;
+}
+
+/* Blockquote — for emphasis */
+.note blockquote {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-style: italic;
+  margin: 1.6rem 0;
+  padding-left: 1.2rem;
+  border-left: 2px solid rgba(17, 17, 17, 0.25); /* #111 @ 25% */
+  color: rgba(17, 17, 17, 0.65); /* #111 @ 65% */
+}
+
+.note blockquote p {
+  margin-bottom: 0.5rem;
+  font-size: 18px;
+  color: rgba(17, 17, 17, 0.65); /* #111 @ 65% */
+}
+
+/* Code */
+.note code {
+  font-family: var(--mono);
+  font-size: 17px;
+  background: var(--code-bg);
+  padding: 0.12em 0.38em;
+  border-radius: 4px;
+  overflow-wrap: break-word;
+  letter-spacing: normal;
+}
+
+.note pre {
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  margin: 0 0 1.4rem;
+}
+
+.note pre code {
+  background: none;
+  padding: 0;
+  /* ui-monospace, 4px below the 18px body size */
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 460;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* Horizontal rule */
+.note hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2.5rem 0;
+}
+
+/* Half divider ("--" on its own line): a third of the column wide. */
+.note hr.hr-half {
+  width: 33%;
+  margin: 40px 0;
+}
+
+/* Tables */
+.note table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.4rem;
+  font-size: 18px;
+}
+
+.note th,
+.note td {
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.note th {
+  font-weight: 500;
+  border-bottom: 1.5px solid var(--text);
+}
+
+/* Images */
+.note img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.5rem 0 1.4rem;
+}
+
+/* ---------- Custom formatting: callouts ----------
+   Written in markdown as:
+   > [!note] Optional title
+   > body text
+*/
+.callout {
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--text);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  margin: 0 0 1.4rem;
+  background: var(--code-bg);
+  font-family: var(--sans);
+}
+
+.callout-label {
+  font-size: 18px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout.callout-warn {
+  border-left-color: var(--text);
+  background: #fafafa;
+}
+
+/* ---------- Citations (sidenotes) ----------
+   Written in markdown as  text[^1]  plus a  [^1]: explanation  line. The
+   note floats beside its marker in the right margin, outside the content
+   column: a negative right margin of its full width + gap pulls it out of
+   the column without displacing any text (after Tufte CSS). */
+:root {
+  --sidenote-width: 14rem;
+  --sidenote-gap: 2.5rem;       /* from the text's right edge */
+}
+
+.sidenote-ref {
+  font-size: 0.65em;
+  line-height: 0;
+  margin-left: 1px;
+}
+
+.note .sidenote-ref a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sidenote {
+  display: none;
+}
+
+.sidenote,
+.note .footnotes {
+  font-size: 14px;
+  font-weight: 460;
+  font-style: normal;
+  line-height: 1.5;
+  color: var(--muted);
+  letter-spacing: normal;
+}
+
+.sidenote > sup {
+  font-size: 0.75em;
+}
+
+/* Links in citations take the muted citation color, so they blend in. */
+.note :is(.sidenote, .footnotes) a {
+  color: inherit;
+  text-decoration-color: var(--muted);
+}
+
+/* On hover the text and underline go from 40% to full black together; the
+   underline keeps its 1px weight. */
+.note :is(.sidenote, .footnotes) a:hover {
+  color: #000000;
+  text-decoration-color: #000000;
+  text-decoration-thickness: 1px;
+}
+
+/* Wide enough for the margin column: the centered 45rem container leaves
+   (100vw - 45rem) / 2 on the right, which must fit the note text inset
+   (1.5rem) + gap + width + a 1.5rem edge. Keep in sync with the tokens. */
+@media (min-width: 78rem) {
+  .sidenote {
+    display: block;
+    float: right;
+    clear: right;
+    width: var(--sidenote-width);
+    margin-right: calc(-1 * (var(--sidenote-width) + var(--sidenote-gap)));
+    margin-bottom: 1rem;
+  }
+
+  /* Reach past the callout's padding + border to line up with the others. */
+  .callout .sidenote {
+    margin-right: calc(-1 * (var(--sidenote-width) + var(--sidenote-gap)) - 1.1rem - 1px);
+  }
+
+  .note .footnotes {
+    display: none;
+  }
+
+  /* The number is just a marker here; its note is right beside it. */
+  .note .sidenote-ref a {
+    pointer-events: none;
+  }
+}
+
+/* Too narrow for a margin: notes are listed at the end of the page. */
+.note .footnotes {
+  margin: 64px 0 0;
+  padding: 1.4rem 0 0 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.note .footnotes li {
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+
+/* ---------- Hover notes ----------
+   Written in markdown as  [short note]{the larger context}. The short note
+   gets a dotted underline; hovering it opens .hovernote-pop just above it
+   (placed from app.js). */
+.hovernote {
+  text-decoration: underline dotted;
+  text-decoration-color: rgba(0, 0, 0, 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-skip-ink: none;
+}
+
+.hovernote:focus {
+  outline: none;
+}
+
+/* The open hover note sits above the backdrop, so it stays crisp. */
+.hovernote.is-active {
+  position: relative;
+  z-index: 16;
+}
+
+/* Fades in behind the popover to wash out and blur the rest of the page
+   (sidebar included), so the popover text reads cleanly. */
+.hovernote-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  pointer-events: none;
+}
+
+.hovernote-backdrop.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease;
+}
+
+.hovernote:focus-visible {
+  border-radius: 2px;
+  outline: 1px solid var(--line-strong);
+  outline-offset: 2px;
+}
+
+.hovernote-pop {
+  position: absolute;
+  z-index: 20;
+  max-width: min(20rem, calc(100vw - 24px));
+  padding: 0.6rem 0.8rem;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  /* Lifts the popover off the body text behind it, so the two don't blur
+     together. */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.1);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 460;
+  line-height: 1.5;
+  color: var(--text);
+  letter-spacing: normal;
+  /* The popover closes when the pointer leaves the underline, so it must
+     never sit under the pointer itself. */
+  pointer-events: none;
+}
+
+.hovernote-pop.is-wide {
+  max-width: min(32rem, calc(100vw - 24px));
+}
+
+.hovernote-pop[hidden] {
+  display: none;
+}
+
+/* The notch: a bordered square turned 45deg, half of it poking out of the
+   popover's edge toward the underline. --notch-x is set from app.js. */
+.hovernote-pop::after {
+  content: "";
+  position: absolute;
+  left: var(--notch-x, 50%);
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  background: #ffffff;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transform: rotate(45deg);
+}
+
+/* Flipped below the line: the notch moves to the top edge. */
+.hovernote-pop.is-below::after {
+  top: -6px;
+  bottom: auto;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+}
+
+/* Multi-line hover notes render as blocks (paragraphs, bullet lists). */
+.hovernote-pop > :first-child {
+  margin-top: 0;
+}
+.hovernote-pop > :last-child {
+  margin-bottom: 0;
+}
+.hovernote-pop p,
+.hovernote-pop ul,
+.hovernote-pop ol {
+  margin: 0;
+}
+.hovernote-pop ul,
+.hovernote-pop ol {
+  padding-left: 1.1rem;
+}
+/* 8px between any two blocks: text and a list, a list and text. */
+.hovernote-pop > :is(p, ul, ol) + :is(p, ul, ol) {
+  margin-top: 8px;
+}
+.hovernote-pop li {
+  margin: 0;
+}
+.hovernote-pop li + li {
+  margin-top: 4px;
+}
+
+.hovernote-pop a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 0, 0, 0.3);
+  text-underline-offset: 2px;
+}
+
+/* Note meta (folder / date beside the title) */
+.note-meta {
+  flex-shrink: 0;
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 460;
+  font-style: normal;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
