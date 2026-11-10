@@ -1,0 +1,29 @@
+[
+  {
+    "folder": "Intro",
+    "notes": [
+      {
+        "title": "Overview",
+        "path": "Notes/Intro/overview.md"
+      }
+    ]
+  },
+  {
+    "folder": "Notes",
+    "notes": [
+      {
+        "title": "Formatting Reference",
+        "path": "Notes/Notes/formatting.md"
+      }
+    ]
+  },
+  {
+    "folder": "Ideas",
+    "notes": [
+      {
+        "title": "Example Idea",
+        "path": "Notes/Ideas/example-idea.md"
+      }
+    ]
+  }
+]
