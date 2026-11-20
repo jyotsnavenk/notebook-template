@@ -1,16 +1,16 @@
-# Notebook template
+# Cozy Notebook Template
 
-A simple static notebook for reading markdown notes, organized by folder.
-Fork it, replace the three example pages with your own, and you have a
-notebook.
+A simple web-based notebook for reading markdown notes & content management. 
 
-- An index page that lists every note, grouped by folder
+I tend to prefer reading essays/articles on the web than read *always-in-progress* notes on Notion. This Notebook came from the idea that I can have in progress notes that look polished, something I can continue to revisit.
+
+## What you get
+
+- An table-of-contents page that lists every note, grouped by folder
 - A left sidebar on each note with its sections, highlighted as you scroll
-- Citations in the right margin, hover notes, callouts, tables, images and
-  dividers
-- No dependencies and no build step beyond one script
+- Fun features: Citations in the right margin, notes on hover, callouts, tables.
 
-## Use this template
+## Quick Start
 
 1. Click **Use this template** (or fork the repository) and clone your copy.
 2. Run it:
