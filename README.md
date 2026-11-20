@@ -2,7 +2,7 @@
 
 A simple web-based notebook for reading markdown notes & content management. 
 
-I tend to prefer reading essays/articles on the web than read *always-in-progress* notes on Notion. This Notebook came from the idea that I can have in progress notes that look polished, something I can continue to revisit.
+I tend to prefer reading essays/articles on the web than *always-in-progress* notes on Notion. This Notebook came from the idea that I can have in progress notes that look polished, something I can continue to revisit.
 
 ## Features
 
@@ -72,14 +72,12 @@ Optional front matter at the top of a note:
 ```markdown
 ---
 order: 1
-description: A one-line summary shown on the index page.
 hidden: true
 ---
 ```
 
 - `order` sets the note's position in its folder. Notes without one come after,
   A–Z by title.
-- `description` adds a short blurb under the note on the index page.
 - `hidden: true` keeps the file on disk but out of the notebook.
 
 ### Adding a folder

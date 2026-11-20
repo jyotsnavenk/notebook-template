@@ -547,7 +547,7 @@ function updateTocActive() {
 /* ---------- Landing page (table of contents) ----------
    The root route (/) renders a table of contents instead of a note:
    notes grouped by folder, each folder an <h3>, each note a link to its
-   page. Titles and one-line descriptions are synced live from the actual
+   page. Titles are synced live from the actual
    markdown, mirroring the sidebar's syncNavLabelsToHeadings. */
 function renderLanding() {
   document.title = "Notebook";

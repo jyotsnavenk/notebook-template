@@ -339,7 +339,7 @@ body {
 
 /* An h1 that follows body text starts a new section, so give it room. */
 .note :is(p, ul, ol, blockquote) + h1 {
-  margin-top: 64px;
+  margin: 64px 0 1.4rem;
 }
 
 .note h2 {

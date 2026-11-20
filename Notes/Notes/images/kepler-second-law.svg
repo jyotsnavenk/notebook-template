@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 390" role="img" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title>Kepler's second law</title>
+  <desc>A planet moves on an ellipse with the Sun at one focus. Two shaded sectors, one short and wide near the Sun, one long and thin far from it, cover equal areas, swept in equal times.</desc>
+  <ellipse cx="340" cy="180" rx="200" ry="160.0" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+  <g fill="rgba(0,0,0,0.06)" stroke="rgba(0,0,0,0.4)" stroke-width="1" stroke-linejoin="round">
+    <path d="M460.0 180.0 L466.8 303.7 L472.1 300.2 L477.3 296.4 L482.4 292.3 L487.6 288.0 L492.6 283.4 L497.6 278.5 L502.4 273.4 L507.1 267.9 L511.7 262.1 L516.0 256.0 L520.1 249.6 L523.9 242.8 L527.4 235.8 L530.6 228.5 L533.4 220.9 L535.7 213.0 L537.6 204.9 L538.9 196.7 L539.7 188.4 L540.0 180.0 L539.7 171.6 L538.9 163.3 L537.6 155.1 L535.7 147.0 L533.4 139.1 L530.6 131.5 L527.4 124.2 L523.9 117.2 L520.1 110.4 L516.0 104.0 L511.7 97.9 L507.1 92.1 L502.4 86.6 L497.6 81.5 L492.6 76.6 L487.6 72.0 L482.4 67.7 L477.3 63.6 L472.1 59.8 L466.8 56.3 Z"/>
+    <path d="M460.0 180.0 L146.9 138.3 L146.2 140.4 L145.6 142.4 L145.0 144.5 L144.4 146.6 L143.9 148.6 L143.4 150.7 L142.9 152.8 L142.5 154.9 L142.1 157.0 L141.7 159.0 L141.4 161.1 L141.1 163.2 L140.8 165.3 L140.6 167.4 L140.4 169.5 L140.3 171.6 L140.2 173.7 L140.1 175.8 L140.0 177.9 L140.0 180.0 L140.0 182.1 L140.1 184.2 L140.2 186.3 L140.3 188.4 L140.4 190.5 L140.6 192.6 L140.8 194.7 L141.1 196.8 L141.4 198.9 L141.7 201.0 L142.1 203.0 L142.5 205.1 L142.9 207.2 L143.4 209.3 L143.9 211.4 L144.4 213.4 L145.0 215.5 L145.6 217.6 L146.2 219.6 L146.9 221.7 Z"/>
+  </g>
+  <circle cx="460.0" cy="180" r="7" fill="#111111"/>
+  <g fill="#111111" font-size="16" font-weight="500" text-anchor="middle">
+    <text x="460.0" y="162">Sun</text>
+    <text x="540" y="376">Fast, near</text>
+    <text x="140" y="376">Slow, far</text>
+  </g>
+  <text x="340" y="376" fill="rgba(0,0,0,0.4)" font-size="14" text-anchor="middle">Equal areas, equal times</text>
+</svg>

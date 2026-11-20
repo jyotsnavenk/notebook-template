@@ -23,19 +23,16 @@ const IGNORE_FOLDERS = new Set(["ignore"]);
    Front matter is a YAML-ish block at the very top:
        ---
        order: 1
-       description: A one-line summary shown on the landing page.
        hidden: true
        ---
    `order` controls sidebar position; notes with no order sort after ordered
-   ones, then alphabetically. `description` is a one-line blurb shown under the
-   note on the landing page (optional; surrounding quotes are stripped).
+   ones, then alphabetically.
    `hidden: true` keeps the file on disk but leaves it out of the manifest
    entirely — not in the sidebar, never rendered. */
 function metaFromFile(filePath, fallback) {
   let title = fallback;
   let order = null;
   let hidden = false;
-  let description = "";
   try {
     const text = fs.readFileSync(filePath, "utf8");
 
@@ -45,14 +42,12 @@ function metaFromFile(filePath, fallback) {
       if (om) order = parseFloat(om[1]);
       const hid = fm[1].match(/^\s*hidden\s*:\s*(true|yes)\s*$/im);
       if (hid) hidden = true;
-      const dm = fm[1].match(/^\s*description\s*:\s*(.+?)\s*$/m);
-      if (dm) description = dm[1].trim().replace(/^["']|["']$/g, "").trim();
     }
 
     const hm = text.match(/^\s*#\s+(.+?)\s*$/m);
     if (hm) title = hm[1].trim();
   } catch (_) {}
-  return { title, order, hidden, description };
+  return { title, order, hidden };
 }
 
 function prettify(name) {
@@ -97,11 +92,11 @@ function build() {
       .map((file) => {
         const full = path.join(dir, file);
         const relPath = `Notes/${folder}/${file}`;
-        const { title, order, hidden, description } = metaFromFile(
+        const { title, order, hidden } = metaFromFile(
           full,
           prettify(file)
         );
-        return { title, path: relPath, order, hidden, description };
+        return { title, path: relPath, order, hidden };
       })
       // Drop notes marked `hidden: true` — local-only, never on the web.
       .filter((n) => !n.hidden)
@@ -112,10 +107,7 @@ function build() {
         if (b.order != null) return 1;
         return a.title.localeCompare(b.title);
       })
-      // Omit an empty description so notes.json stays tidy.
-      .map(({ title, path, description }) =>
-        description ? { title, path, description } : { title, path }
-      );
+      .map(({ title, path }) => ({ title, path }));
 
     // Skip a folder whose notes are all hidden.
     if (notes.length === 0) continue;
